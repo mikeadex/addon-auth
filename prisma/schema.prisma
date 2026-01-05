@@ -16,13 +16,30 @@ datasource db {
 
 model User {
   id            String    @id @default(cuid())
-  name          String?
+  
+  // Basic Info
+  firstName     String?
+  lastName      String?
+  name          String?   // Full name for backward compatibility
   email         String    @unique
   emailVerified DateTime?
+  phone         String?   @unique
+  phoneVerified DateTime?
   image         String?
   password      String?   // Null for OAuth users
+  
+  // Business Info
+  title         String?   // Job title
+  company       String?   // Company name
+  department    String?
+  employeeId    String?   // Employee/Customer ID
+  taxId         String?   // Tax/VAT ID
+  
+  // System
   role          Role      @default(USER)
   status        UserStatus @default(ACTIVE)
+  lastLoginAt   DateTime?
+  lastLoginIp   String?
   
   // Relations
   accounts      Account[]
@@ -35,7 +52,9 @@ model User {
   updatedAt     DateTime  @updatedAt
   
   @@index([email])
+  @@index([phone])
   @@index([role])
+  @@index([status])
   @@map("users")
 }
 
@@ -104,21 +123,59 @@ model Profile {
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
+  // Personal Information
   bio       String?  @db.Text
-  phone     String?
-  address   String?
-  city      String?
-  country   String?
-  zipCode   String?
+  dateOfBirth DateTime?
+  gender    String?  // Male, Female, Other, Prefer not to say
+  nationality String?
+  
+  // Contact Information
+  alternateEmail String?
+  alternatePhone String?
+  website    String?
+  
+  // Address
+  address    String?  @db.Text
+  address2   String?  // Apartment, suite, etc.
+  city       String?
+  state      String?  // State/Province/Region
+  country    String?
+  zipCode    String?
+  
+  // Business/Professional
+  industry   String?
+  jobTitle   String?
+  companyName String?
+  yearsOfExperience Int?
+  linkedIn   String?
+  github     String?
+  twitter    String?
+  
+  // Emergency Contact
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  emergencyContactRelation String?
   
   // Preferences
-  settings  Json?    // Store user preferences as JSON
-  theme     String?  @default("light")
-  language  String?  @default("en")
+  settings   Json?    // Store additional preferences as JSON
+  theme      String?  @default("light")
+  language   String?  @default("en")
+  timezone   String?  @default("UTC")
+  currency   String?  @default("USD")
   
   // Notifications
   emailNotifications   Boolean @default(true)
   pushNotifications    Boolean @default(true)
+  smsNotifications     Boolean @default(false)
+  marketingEmails      Boolean @default(false)
+  
+  // Privacy
+  profileVisibility    String? @default("public") // public, private, contacts
+  showEmail            Boolean @default(false)
+  showPhone            Boolean @default(false)
+  
+  // Additional Custom Fields (for extensibility)
+  customFields Json?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -135,17 +192,28 @@ model AuditLog {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  action    String   // LOGIN, LOGOUT, UPDATE_PROFILE, etc.
+  action    String   // LOGIN, LOGOUT, UPDATE_PROFILE, PASSWORD_CHANGE, etc.
   resource  String?  // Resource type (User, Profile, etc.)
   resourceId String? // ID of the resource
   details   Json?    // Additional details
+  
+  // Request Info
   ipAddress String?
   userAgent String?  @db.Text
+  location  String?  // Geographic location (city, country)
+  device    String?  // Device type (desktop, mobile, tablet)
+  browser   String?  // Browser name
+  os        String?  // Operating system
+  
+  // Status
+  status    String?  @default("success") // success, failed, warning
+  errorMessage String? @db.Text
   
   createdAt DateTime @default(now())
   
   @@index([userId])
   @@index([action])
+  @@index([status])
   @@index([createdAt])
   @@map("audit_logs")
 }
