@@ -5,6 +5,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
 import bcrypt from 'bcrypt';
 import { prisma } from './prisma';
+import { Role } from '@prisma/client';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -29,6 +30,11 @@ export const authOptions: NextAuthOptions = {
 
         if (!user || !user.password) {
           throw new Error('Invalid credentials');
+        }
+
+        // Check if user is verified
+        if (!user.isVerified) {
+          throw new Error('Please verify your account before signing in');
         }
 
         // Check if user is suspended
@@ -112,7 +118,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.role = token.role as Role;
         session.user.email = token.email as string;
       }
       return session;

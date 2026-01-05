@@ -35,6 +35,10 @@ export async function POST(req: Request) {
     // Hash password
     const hashedPassword = await hash(validatedData.password, 10);
 
+    // Generate verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
     // Create user
     const user = await prisma.user.create({
       data: {
@@ -47,6 +51,10 @@ export async function POST(req: Request) {
         password: hashedPassword,
         phone: validatedData.phone,
         company: validatedData.company,
+        verificationCode,
+        verificationExpiry,
+        isVerified: false,
+        status: 'INACTIVE', // Inactive until verified
         profile: {
           create: {
             companyName: validatedData.company,
@@ -69,12 +77,15 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       {
-        message: 'User created successfully',
+        message: 'User created successfully. Please verify your account.',
         user: {
           id: user.id,
           email: user.email,
           name: user.name,
         },
+        verificationRequired: true,
+        // In development, return the code for testing
+        ...(process.env.NODE_ENV === 'development' && { verificationCode }),
       },
       { status: 201 }
     );

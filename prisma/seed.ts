@@ -19,6 +19,8 @@ async function main() {
       password: hashedPassword,
       role: Role.ADMIN,
       emailVerified: new Date(),
+      isVerified: true,
+      status: 'ACTIVE',
       profile: {
         create: {
           bio: 'System Administrator',
@@ -38,6 +40,8 @@ async function main() {
       email: 'user@example.com',
       name: 'Regular User',
       password: hashedPassword,
+      isVerified: true,
+      status: 'ACTIVE',
       role: Role.USER,
       emailVerified: new Date(),
       profile: {
@@ -60,6 +64,8 @@ async function main() {
       password: hashedPassword,
       role: Role.MODERATOR,
       emailVerified: new Date(),
+      isVerified: true,
+      status: 'ACTIVE',
       profile: {
         create: {
           bio: 'Content Moderator',

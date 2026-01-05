@@ -41,6 +41,15 @@ model User {
   lastLoginAt   DateTime?
   lastLoginIp   String?
   
+  // Verification
+  verificationCode     String?
+  verificationExpiry   DateTime?
+  isVerified           Boolean  @default(false)
+  
+  // Password Reset
+  resetToken           String?
+  resetTokenExpiry     DateTime?
+  
   // Relations
   accounts      Account[]
   sessions      Session[]

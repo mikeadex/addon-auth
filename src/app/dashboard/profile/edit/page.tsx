@@ -1,14 +1,14 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import SettingsClient from '@/components/dashboard/settings-client';
+import EditProfileClient from '@/components/dashboard/edit-profile-client';
 
-export default async function SettingsPage() {
+export default async function EditProfilePage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect('/auth/signin');
   }
 
-  return <SettingsClient user={session.user} />;
+  return <EditProfileClient user={session.user} />;
 }

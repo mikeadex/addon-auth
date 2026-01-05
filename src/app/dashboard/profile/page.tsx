@@ -3,9 +3,11 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { prisma } from '@/lib/prisma';
-import { User, Mail, Phone, Building, Calendar, MapPin } from 'lucide-react';
+import { User, Mail, Phone, Building, Calendar, MapPin, Edit } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import Link from 'next/link';
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -26,9 +28,17 @@ export default async function ProfilePage() {
   return (
     <DashboardLayout user={session.user}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Profile</h1>
-          <p className="text-gray-600 mt-1">Manage your personal information</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Profile</h1>
+            <p className="text-gray-600 mt-1">Manage your personal information</p>
+          </div>
+          <Link href="/dashboard/profile/edit">
+            <Button>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
+          </Link>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
